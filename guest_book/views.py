@@ -4,7 +4,7 @@ from .forms import GuestForm
 import json
 
 def guestbook(request,pid):
-    ret = {'status': True, 'error': None, 'data': None}
+    
     if request.method == 'GET':
         if pid == None:
             pid = 1
@@ -77,10 +77,16 @@ def guestbook(request,pid):
         return render(request,'guestbook.html',{'guest_list':guest_list,'total_count':total_count, 'page_list':page_list})
 
     elif request.method == "POST":
+        ret = {'status': True, 'error': None, 'data': None}
         obj = GuestForm(request.POST)
-        print (request.POST)
         if obj.is_valid():
             models.GuestBook.objects.create(**obj.cleaned_data)
+           
+            # 生成测试数据
+#             for i in range(500):
+#                 models.GuestBook.objects.create(username= str(i),
+#                                                content= str(i))
+            
         else:
             res_str = obj.errors.as_json()  # res_str是一个字符串
             ret['status'] = False
