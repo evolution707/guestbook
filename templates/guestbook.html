@@ -1,0 +1,245 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">
+
+    <style>
+        .guestbook {
+            margin: 50px auto;
+            background-color: lightblue;
+            width: 900px;
+            height: 2200px;
+
+        }
+        .header {
+            border-bottom: 2px solid white;
+            width: 800px;
+            height: 150px;
+            margin: 0 auto;
+
+
+        }
+        .header span {
+            font-size: 22px;
+            color: white;
+            display: inline-block;
+            margin-top: 100px;
+
+        }
+        .master_say {
+            width: 800px;
+            height: 150px;
+            margin: 0 auto;
+        }
+        .master_say span {
+            font-size: 16px;
+            color: white;
+            display: inline-block;
+            margin-top: 20px;
+
+        }
+        .message {
+            width: 800px;
+            margin: 0 auto;
+
+        }
+        .message span {
+            font-size: 16px;
+            color: white;
+            display: inline-block;
+        }
+        .form {
+            margin: 0;
+        }
+        .form textarea {
+            display: block;
+            visibility:hidden;
+            width: 800px;
+        }
+        .form input {
+            display: inline-block;
+            width: 200px;
+            height: 30px;
+        }
+
+        .commit input {
+            margin-top: 10px;
+            height: 25px;
+            width: 80px;
+            text-align: center;
+            line-height: 25px;
+            border-radius: 5px;
+            font-size: 17px;
+            background-color: white;
+            color: lightblue;
+        }
+
+        .message_history {
+            width: 800px;
+            height: 1000px;
+        }
+        .message_history .header {
+            border-bottom: 2px solid white;
+            height: 100px;
+        }
+        .message_history .header span {
+            margin-top: 60px;
+            font-size: 17px;
+        }
+        .message_history li {
+            height: 130px;
+            border-bottom: 1px solid white;
+
+        }
+
+        .message_history p:nth-child(1){
+
+            margin-top: 10px;
+            height: 20px;
+            width: auto;
+        }
+        .message_history p:nth-child(2){
+            margin-top: 10px;
+
+        }
+        .message_history p:nth-child(3){
+            margin-top: 30px;
+            color: #337FE5;
+            height: 20px;
+            width: auto;
+
+        }
+        .pagination {
+            width: auto;
+            height: 30px;
+            margin: 30px auto;
+            text-align: center;
+        }
+        .pagination a {
+            display: inline-block;
+            height: 30px;
+            width: 40px;
+            line-height: 30px;
+            margin: auto 5px;
+        }
+        .pagination a:nth-child(1){
+            width: 60px;
+        }
+        .pagination a:nth-last-child(1){
+            width: 60px;
+        }
+        .active {
+            background-color: white;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="guestbook">
+        <div class="header">
+            <span >留言簿</span>
+        </div>
+        <div class="master_say">
+            <span>主人寄语</span>
+            <br>
+            <span>欢迎光临我的空间，请留下您想对我说的话。</span>
+        </div>
+        <div class="message">
+            <span>发表您的留言：</span>
+            <form method="POST" class="form" id="form">
+                {% csrf_token %}
+                <textarea name="content" id="content" ></textarea>
+                <br>
+                <span>留下您的大名：</span>
+                <br>
+                <input type="text" name="username" id="username">
+                <div class="commit">
+                    <input type="button" value="提交" id="btn">
+                </div>
+            </form>
+            <div class="message_history">
+                <div class="header">
+                    <span>留言（{{ total_count }}）</span>
+                </div>
+                <ul>
+                     {% for row in guest_list %}
+                         <li>
+                             <p>{{ row.username }}</p>
+                             <p>{{ row.content | safe }}</p>
+                             <p>{{ row.date | date:'Y-m-d H:i:s' }}</p>
+                         </li>
+                     {% endfor %}
+                </ul>
+                <div class="pagination">
+                        {{ page_list | safe }}
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <script src="{% static 'js/jquery-1.8.3.min.js'%}"></script>
+    <script src="{% static 'plugins/kind-editor/kindeditor-min.js'%}"></script>
+    <script>
+        $(function () {
+            initKindEditor();
+
+        function initKindEditor() {
+            var kind = KindEditor.create('#content', {
+                resizeType : 0,
+                allowImageUpload : false,
+                items : [
+                    'fontname', '|','fontsize', '|', 'forecolor','|', 'hilitecolor', 'bold', 'italic', 'underline',
+                    'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                    'insertunorderedlist', '|', 'emoticons', 'image', 'link'],
+                afterBlur: function(){this.sync();}
+                // 这句的作用是，同步KindEditor的值到textarea文本框中
+                //这样才能取到文本框的中值
+});
+
+             $html = str_replace('&nbsp;', '&amp;nbsp;', $html);
+             $html = str_replace('&gt;', '&amp;gt;', $html);
+             $html = str_replace('&lt;', '&amp;lt;', $html);
+
+        }
+});
+        $('#btn').click(function () {
+            $.ajax({
+                url: "guestbook.html",
+                data: $('#form').serialize(),
+                type: 'POST',
+                success: function (arg) {
+                    $('.error-msg').remove();
+                    // 将后台返回的字符串解析成JSON对象
+                    var obj = JSON.parse(arg);
+                   // obj ---->{status: false, error: "{"username": [{"message": "\u5927\", "code": "required"}]}", data: null}
+                    if (!obj.status) {
+                        var error_obj = JSON.parse(obj.error);
+                        // error_obj----> 0:{message: "内容不可以为空哦！", code: "required"}
+
+                        // 遍历error_obj中的对象，分别在其后面添加一个span标签，并将错误信息设置为其属性
+                        $.each(error_obj, function (k, v) {
+                            var tag = document.createElement('span');
+                            tag.className = 'error-msg';
+                            tag.innerHTML = v[0].message;
+                            $("textarea[name='" + k + "']").after(tag);
+                            $("input[name='" + k + "']").after(tag);
+                        })
+                    } else {
+                        // 刷新当前页面
+                        location.href = "guestbook.html"
+                    }
+                }
+
+            })
+        })
+
+
+    </script>
+</body>
+</html>
