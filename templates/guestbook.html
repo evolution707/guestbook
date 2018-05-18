@@ -12,22 +12,18 @@
             background-color: lightblue;
             width: 900px;
             height: 2200px;
-
         }
         .header {
             border-bottom: 2px solid white;
             width: 800px;
             height: 150px;
             margin: 0 auto;
-
-
         }
         .header span {
             font-size: 22px;
             color: white;
             display: inline-block;
             margin-top: 100px;
-
         }
         .master_say {
             width: 800px;
@@ -39,12 +35,10 @@
             color: white;
             display: inline-block;
             margin-top: 20px;
-
         }
         .message {
             width: 800px;
             margin: 0 auto;
-
         }
         .message span {
             font-size: 16px;
@@ -92,11 +86,9 @@
         .message_history li {
             height: 130px;
             border-bottom: 1px solid white;
-
         }
 
         .message_history p:nth-child(1){
-
             margin-top: 10px;
             height: 20px;
             width: auto;
@@ -110,7 +102,6 @@
             color: #337FE5;
             height: 20px;
             width: auto;
-
         }
         .pagination {
             width: auto;
@@ -200,14 +191,10 @@
                 afterBlur: function(){this.sync();}
                 // 这句的作用是，同步KindEditor的值到textarea文本框中
                 //这样才能取到文本框的中值
-});
 
-             $html = str_replace('&nbsp;', '&amp;nbsp;', $html);
-             $html = str_replace('&gt;', '&amp;gt;', $html);
-             $html = str_replace('&lt;', '&amp;lt;', $html);
-
+     
+        });
         }
-});
         $('#btn').click(function () {
             $.ajax({
                 url: "guestbook.html",
@@ -235,11 +222,9 @@
                         location.href = "guestbook.html"
                     }
                 }
-
             })
-        })
-
-
+        });
+        });
     </script>
 </body>
 </html>
